@@ -49,7 +49,7 @@ class Aafm:
 
 
 	def get_device_file_list(self):
-		return self.parse_device_list( self.device_list_files(self.device_cwd) )
+		return self.parse_device_list( self.device_list_files( self._path_join_function(self.device_cwd, '')) )
 
 
 	def device_list_files(self, device_dir):
@@ -60,7 +60,7 @@ class Aafm:
 
 	def parse_device_list(self, lines):
 		entries = {}
-		pattern = re.compile(r"^(?P<permissions>[drwx\-]+) (?P<owner>\w+)\W+(?P<group>[\w_]+)\W*(?P<size>\d+)?\W+(?P<datetime>\d{4}-\d{2}-\d{2} \d{2}:\d{2}) (?P<name>.+)$")
+		pattern = re.compile(r"^(?P<permissions>[dl\-][rwx\-]+) (?P<owner>\w+)\W+(?P<group>[\w_]+)\W*(?P<size>\d+)?\W+(?P<datetime>\d{4}-\d{2}-\d{2} \d{2}:\d{2}) (?P<name>.+)$")
 
 		for line in lines:
 			line = line.rstrip()
@@ -77,6 +77,9 @@ class Aafm:
 				timestamp = time.mktime((time.strptime(match.group('datetime'), "%Y-%m-%d %H:%M")))
 				
 				is_directory = permissions.startswith('d')
+				if permissions.startswith('l'):
+					filename, target = filename.split(' -> ')
+					is_directory = self.is_device_file_a_directory(target)
 
 				entries[filename] = { 
 					'is_directory': is_directory,
