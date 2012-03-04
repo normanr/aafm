@@ -729,20 +729,20 @@ class Aafm_GUI:
 				if is_directory:
 					destination = self.aafm.device_path_join(self.device_cwd, name)
 
-			if type == 'DRAG_SELF':
-				if self.device_cwd != destination:
-					for line in [line.strip() for line in data.split('\n')]:
-						if line.startswith('file://'):
-							source = urllib.unquote(line.replace('file://', '', 1))
-							if source != destination:
-								name = self.aafm.device_path_basename(source)
-								self.add_to_queue(self.QUEUE_ACTION_MOVE_IN_DEVICE, source, os.path.join(destination, name))
-			else:
-				# COPY stuff
+		if type == 'DRAG_SELF':
+			if self.device_cwd != destination:
 				for line in [line.strip() for line in data.split('\n')]:
 					if line.startswith('file://'):
 						source = urllib.unquote(line.replace('file://', '', 1))
-						self.add_to_queue(self.QUEUE_ACTION_COPY_TO_DEVICE, source, destination)
+						if source != destination:
+							name = self.aafm.device_path_basename(source)
+							self.add_to_queue(self.QUEUE_ACTION_MOVE_IN_DEVICE, source, os.path.join(destination, name))
+		else:
+			# COPY stuff
+			for line in [line.strip() for line in data.split('\n')]:
+				if line.startswith('file://'):
+					source = urllib.unquote(line.replace('file://', '', 1))
+					self.add_to_queue(self.QUEUE_ACTION_COPY_TO_DEVICE, source, destination)
 		self.process_queue()
 
 
