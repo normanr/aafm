@@ -714,7 +714,7 @@ class Aafm_GUI:
 		type = selection.type
 		drop_info = tree_view.get_dest_row_at_pos(x, y)
 		destination = self.device_cwd
-
+		
 		# When dropped over a row
 		if drop_info:
 			model = tree_view.get_model()
@@ -743,6 +743,7 @@ class Aafm_GUI:
 				if line.startswith('file://'):
 					source = urllib.unquote(line.replace('file://', '', 1))
 					self.add_to_queue(self.QUEUE_ACTION_COPY_TO_DEVICE, source, destination)
+		
 		self.process_queue()
 
 
